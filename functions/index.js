@@ -32,9 +32,73 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         }
     }
 
+    function handleFan(agent) {
+        var fan = agent.parameters['fan'];
+        try {
+            database.ref('fanStatus').set({fan: fan});
+            switch(fan){
+                case '0':
+                    agent.add('ปิดพัดลมแล้วค่ะ');
+                    break;
+                case '1':
+                    agent.add('เปิดพัดลมแล้วค่ะ');
+                    break;
+                default: 
+                    agent.add('มีอะไรให้รับใช้คะ');
+                    break;
+            }
+        } catch (ex) {
+            console.log('Database update error! : '+ex);
+        }
+    }
+
+    function handleLivingroomLight(agent) {
+        var livingroomLight = agent.parameters['livingroomLight'];
+        try {
+            database.ref('livingroomLightStatus').set({livingroomLight: livingroomLight});
+            switch(livingroomLight){
+                case '0':
+                    agent.add('ปิดไฟห้องนั่งเล่นแล้วค่ะ');
+                    break;
+                case '1':
+                    agent.add('เปิดไฟห้องนั่งเล่นแล้วค่ะ');
+                    break;
+                default: 
+                    agent.add('มีอะไรให้รับใช้คะ');
+                    break;
+            }
+        } catch (ex) {
+            console.log('Database update error! : '+ex);
+        }
+    }
+
+    function handleTv(agent) {
+        var tv = agent.parameters['tv'];
+        try {
+            database.ref('tvStatus').set({tv: tv});
+            switch(tv){
+                case '0':
+                    agent.add('ปิดทีวีแล้วค่ะ');
+                    break;
+                case '1':
+                    agent.add('เปิดทีวีแล้วค่ะ');
+                    break;
+                default: 
+                    agent.add('มีอะไรให้รับใช้คะ');
+                    break;
+            }
+        } catch (ex) {
+            console.log('Database update error! : '+ex);
+        }
+    }
+
+    
 
     let intenMap = new Map();
     intenMap.set('bedroomLight_Intent', handleBedroomLight);
+    intenMap.set('fan_Intent', handleFan);
+    intenMap.set('livingroomLight_Intent', handleLivingroomLight);
+    intenMap.set('tv_Intent', handleTv);
     agent.handleRequest(intenMap);
 
 });
