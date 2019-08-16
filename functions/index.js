@@ -108,6 +108,99 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         }
     }
 
+    function handleAllLights(agent) {
+        var allLights = agent.parameters['allLights'];
+        try {
+            database.ref('bedroomLightStatus').set({
+                bedroomLight: allLights,
+                timestamp: dateTime
+            });
+            database.ref('livingroomLightStatus').set({
+                livingroomLight: allLights,
+                timestamp: dateTime
+            });
+
+            switch(allLights){
+                case '0':
+                    agent.add('ปิดไฟทั้งหมดแล้วค่ะ');
+                    break;
+                case '1':
+                    agent.add('เปิดไฟทั้งหมดแล้วค่ะ');
+                    break;
+                default: 
+                    agent.add('มีอะไรให้รับใช้คะ');
+                    break;
+            }
+        } catch (ex) {
+            console.log('Database update error! : '+ex);
+        }
+    }
+
+    function handleAllDevices(agent) {
+        var allDevices = agent.parameters['allDevices'];
+        try {
+            database.ref('bedroomLightStatus').set({
+                bedroomLight: allDevices,
+                timestamp: dateTime
+            });
+            database.ref('livingroomLightStatus').set({
+                livingroomLight: allDevices,
+                timestamp: dateTime
+            });
+            database.ref('fanStatus').set({
+                fan: allDevices,
+                timestamp: dateTime
+            });
+            database.ref('tvStatus').set({
+                tv: allDevices,
+                timestamp: dateTime
+            });
+
+            switch(allDevices){
+                case '0':
+                    agent.add('ปิดอุปกรณ์ภายในบ้านทั้งหมดแล้วค่ะ');
+                    break;
+                case '1':
+                    agent.add('เปิดอุปกรณ์ภายในบ้านทั้งหมดแล้วค่ะ');
+                    break;
+                default: 
+                    agent.add('มีอะไรให้รับใช้คะ');
+                    break;
+            }
+        } catch (ex) {
+            console.log('Database update error! : '+ex);
+        }
+    }
+
+    function handleElectronicDevices(agent) {
+        var electronicDevices = agent.parameters['electronicDevices'];
+        try {
+            
+            database.ref('fanStatus').set({
+                fan: electronicDevices,
+                timestamp: dateTime
+            });
+            database.ref('tvStatus').set({
+                tv: electronicDevices,
+                timestamp: dateTime
+            });
+
+            switch(electronicDevices){
+                case '0':
+                    agent.add('ปิดเครื่องใช้ไฟฟ้าภายในบ้านทั้งหมดแล้วค่ะ');
+                    break;
+                case '1':
+                    agent.add('เปิดเครื่องใช้ไฟฟ้าภายในบ้านทั้งหมดแล้วค่ะ');
+                    break;
+                default: 
+                    agent.add('มีอะไรให้รับใช้คะ');
+                    break;
+            }
+        } catch (ex) {
+            console.log('Database update error! : '+ex);
+        }
+    }
+
     
 
     let intenMap = new Map();
@@ -115,6 +208,9 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     intenMap.set('fan_Intent', handleFan);
     intenMap.set('livingroomLight_Intent', handleLivingroomLight);
     intenMap.set('tv_Intent', handleTv);
+    intenMap.set('allLights_Intent', handleAllLights);
+    intenMap.set('allDevices_Intent', handleAllDevices);
+    intenMap.set('electronicDevices_Intent', handleElectronicDevices);
     agent.handleRequest(intenMap);
 
 });
