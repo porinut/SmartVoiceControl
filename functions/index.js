@@ -6,6 +6,10 @@ var admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 var database = admin.database();
 
+var currentDate = new Date();
+var date = currentDate.getFullYear()+'-'+(currentDate.getMonth()+1)+'-'+currentDate.getDate();
+var time = currentDate.getHours() + ":" + currentDate.getMinutes() + ":" + currentDate.getSeconds();
+var dateTime = date+' @ '+time;
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
     const agent = new WebhookClient({ request, response});
@@ -15,7 +19,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     function handleBedroomLight(agent) {
         var bedroomLight = agent.parameters['bedroomLight'];
         try {
-            database.ref('bedroomLightStatus').set({bedroomLight: bedroomLight});
+            database.ref('bedroomLightStatus').set({
+                bedroomLight: bedroomLight,
+                timestamp: dateTime
+            });
             switch(bedroomLight){
                 case '0':
                     agent.add('ปิดไฟห้องนอนแล้วค่ะ');
@@ -35,7 +42,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     function handleFan(agent) {
         var fan = agent.parameters['fan'];
         try {
-            database.ref('fanStatus').set({fan: fan});
+            database.ref('fanStatus').set({
+                fan: fan,
+                timestamp: dateTime
+            });
             switch(fan){
                 case '0':
                     agent.add('ปิดพัดลมแล้วค่ะ');
@@ -55,7 +65,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     function handleLivingroomLight(agent) {
         var livingroomLight = agent.parameters['livingroomLight'];
         try {
-            database.ref('livingroomLightStatus').set({livingroomLight: livingroomLight});
+            database.ref('livingroomLightStatus').set({
+                livingroomLight: livingroomLight,
+                timestamp: dateTime
+            });
             switch(livingroomLight){
                 case '0':
                     agent.add('ปิดไฟห้องนั่งเล่นแล้วค่ะ');
@@ -75,7 +88,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     function handleTv(agent) {
         var tv = agent.parameters['tv'];
         try {
-            database.ref('tvStatus').set({tv: tv});
+            database.ref('tvStatus').set({
+                tv: tv,
+                timestamp: dateTime
+            });
             switch(tv){
                 case '0':
                     agent.add('ปิดทีวีแล้วค่ะ');
