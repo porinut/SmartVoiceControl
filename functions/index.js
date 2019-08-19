@@ -5,203 +5,95 @@ const {WebhookClient} = require('dialogflow-fulfillment');
 var admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 var database = admin.database();
-
-var currentDate = new Date();
-var date = currentDate.getFullYear()+'-'+(currentDate.getMonth()+1)+'-'+currentDate.getDate();
-var time = currentDate.getHours() + ":" + currentDate.getMinutes() + ":" + currentDate.getSeconds();
-var dateTime = date+' @ '+time;
+const firebaseModel = require('./firebase_model');
+const dialogflowModel = require('./dialogflow_model');
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
     const agent = new WebhookClient({ request, response});
     console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
     console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
  
-    function handleBedroomLight(agent) {
-        var bedroomLight = agent.parameters['bedroomLight'];
+    function handleBedroomLight(agent){
+        var device = 'bedroomLight';
+        var status = agent.parameters[device];
         try {
-            database.ref('bedroomLightStatus').set({
-                bedroomLight: bedroomLight,
-                timestamp: dateTime
-            });
-            switch(bedroomLight){
-                case '0':
-                    agent.add('ปิดไฟห้องนอนแล้วค่ะ');
-                    break;
-                case '1':
-                    agent.add('เปิดไฟห้องนอนแล้วค่ะ');
-                    break;
-                default: 
-                    agent.add('มีอะไรให้รับใช้คะ');
-                    break;
-            }
+            firebaseModel.updateFirebase(database,device,status);
+            dialogflowModel.addResponse(agent,status,'ปิดไฟห้องนอนแล้วค่ะ','เปิดไฟห้องนอนแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
     }
 
-    function handleFan(agent) {
-        var fan = agent.parameters['fan'];
+    function handleLivingroomLight(agent){
+        var device = 'livingroomLight';
+        var status = agent.parameters[device];
         try {
-            database.ref('fanStatus').set({
-                fan: fan,
-                timestamp: dateTime
-            });
-            switch(fan){
-                case '0':
-                    agent.add('ปิดพัดลมแล้วค่ะ');
-                    break;
-                case '1':
-                    agent.add('เปิดพัดลมแล้วค่ะ');
-                    break;
-                default: 
-                    agent.add('มีอะไรให้รับใช้คะ');
-                    break;
-            }
+            firebaseModel.updateFirebase(database,device,status);
+            dialogflowModel.addResponse(agent,status,'ปิดไฟห้องนั่งเล่นแล้วค่ะ','เปิดไฟห้องนั่งเล่นแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
     }
 
-    function handleLivingroomLight(agent) {
-        var livingroomLight = agent.parameters['livingroomLight'];
+    function handleFan(agent){
+        var device = 'fan';
+        var status = agent.parameters[device];
         try {
-            database.ref('livingroomLightStatus').set({
-                livingroomLight: livingroomLight,
-                timestamp: dateTime
-            });
-            switch(livingroomLight){
-                case '0':
-                    agent.add('ปิดไฟห้องนั่งเล่นแล้วค่ะ');
-                    break;
-                case '1':
-                    agent.add('เปิดไฟห้องนั่งเล่นแล้วค่ะ');
-                    break;
-                default: 
-                    agent.add('มีอะไรให้รับใช้คะ');
-                    break;
-            }
+            firebaseModel.updateFirebase(database,device,status);
+            dialogflowModel.addResponse(agent,status,'ปิดพัดลมแล้วค่ะ','เปิดพัดลมแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
     }
 
-    function handleTv(agent) {
-        var tv = agent.parameters['tv'];
+    function handleTv(agent){
+        var device = 'tv';
+        var status = agent.parameters[device];
         try {
-            database.ref('tvStatus').set({
-                tv: tv,
-                timestamp: dateTime
-            });
-            switch(tv){
-                case '0':
-                    agent.add('ปิดทีวีแล้วค่ะ');
-                    break;
-                case '1':
-                    agent.add('เปิดทีวีแล้วค่ะ');
-                    break;
-                default: 
-                    agent.add('มีอะไรให้รับใช้คะ');
-                    break;
-            }
+            firebaseModel.updateFirebase(database,device,status);
+            dialogflowModel.addResponse(agent,status,'ปิดทีวีแล้วค่ะ','เปิดทีวีแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
     }
 
-    function handleAllLights(agent) {
-        var allLights = agent.parameters['allLights'];
+    function handleAllLights(agent){
+        var device = 'allLights';
+        var status = agent.parameters[device];
         try {
-            database.ref('bedroomLightStatus').set({
-                bedroomLight: allLights,
-                timestamp: dateTime
-            });
-            database.ref('livingroomLightStatus').set({
-                livingroomLight: allLights,
-                timestamp: dateTime
-            });
-
-            switch(allLights){
-                case '0':
-                    agent.add('ปิดไฟทั้งหมดแล้วค่ะ');
-                    break;
-                case '1':
-                    agent.add('เปิดไฟทั้งหมดแล้วค่ะ');
-                    break;
-                default: 
-                    agent.add('มีอะไรให้รับใช้คะ');
-                    break;
-            }
+            firebaseModel.updateFirebase(database,'bedroomLight',status);
+            firebaseModel.updateFirebase(database,'livingroomLight',status);
+            dialogflowModel.addResponse(agent,status,'ปิดไฟทั้งหมดแล้วค่ะ','เปิดไฟทั้งหมดแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
     }
 
-    function handleAllDevices(agent) {
-        var allDevices = agent.parameters['allDevices'];
+    function handleElectronicDevices(agent){
+        var device = 'electronicDevices';
+        var status = agent.parameters[device];
         try {
-            database.ref('bedroomLightStatus').set({
-                bedroomLight: allDevices,
-                timestamp: dateTime
-            });
-            database.ref('livingroomLightStatus').set({
-                livingroomLight: allDevices,
-                timestamp: dateTime
-            });
-            database.ref('fanStatus').set({
-                fan: allDevices,
-                timestamp: dateTime
-            });
-            database.ref('tvStatus').set({
-                tv: allDevices,
-                timestamp: dateTime
-            });
-
-            switch(allDevices){
-                case '0':
-                    agent.add('ปิดอุปกรณ์ภายในบ้านทั้งหมดแล้วค่ะ');
-                    break;
-                case '1':
-                    agent.add('เปิดอุปกรณ์ภายในบ้านทั้งหมดแล้วค่ะ');
-                    break;
-                default: 
-                    agent.add('มีอะไรให้รับใช้คะ');
-                    break;
-            }
+            firebaseModel.updateFirebase(database,'fan',status);
+            firebaseModel.updateFirebase(database,'tv',status);
+            dialogflowModel.addResponse(agent,status,'ปิดเครื่องใช้ไฟฟ้าทั้งหมดแล้วค่ะ','เปิดเครื่องใช้ไฟฟ้าทั้งหมดแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
     }
 
-    function handleElectronicDevices(agent) {
-        var electronicDevices = agent.parameters['electronicDevices'];
+    function handleAllDevices(agent){
+        var device = 'allDevices';
+        var status = agent.parameters[device];
         try {
-            
-            database.ref('fanStatus').set({
-                fan: electronicDevices,
-                timestamp: dateTime
-            });
-            database.ref('tvStatus').set({
-                tv: electronicDevices,
-                timestamp: dateTime
-            });
-
-            switch(electronicDevices){
-                case '0':
-                    agent.add('ปิดเครื่องใช้ไฟฟ้าภายในบ้านทั้งหมดแล้วค่ะ');
-                    break;
-                case '1':
-                    agent.add('เปิดเครื่องใช้ไฟฟ้าภายในบ้านทั้งหมดแล้วค่ะ');
-                    break;
-                default: 
-                    agent.add('มีอะไรให้รับใช้คะ');
-                    break;
-            }
+            firebaseModel.updateFirebase(database,'fan',status);
+            firebaseModel.updateFirebase(database,'tv',status);
+            firebaseModel.updateFirebase(database,'bedroomLight',status);
+            firebaseModel.updateFirebase(database,'livingroomLight',status);
+            dialogflowModel.addResponse(agent,status,'ปิดอุปกรณ์ทั้งหมดแล้วค่ะ','เปิดอุปกรณ์ทั้งหมดแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
     }
-
-    
 
     let intenMap = new Map();
     intenMap.set('bedroomLight_Intent', handleBedroomLight);
