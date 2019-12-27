@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 'use strict';
 
 const functions = require('firebase-functions');
@@ -12,12 +13,80 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     const agent = new WebhookClient({ request, response});
     console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
     console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
- 
-    function handleBedroomLight(agent){
-        var device = 'bedroomLight';
-        var status = agent.parameters[device];
+/*-----------------------------------------------Function--------------------------------------------------------------*/ 
+    //function Handle Switch
+    function handleSwitch(agent){
+        //Parameter name in dialogflow 
+        var numberSwitch1 = agent.parameters['numberSwitch1'];
+        var numberSwitch2 = agent.parameters['numberSwitch2']; 
+        var statusSwitch1 = agent.parameters['statusSwitch1'];
+        var statusSwitch2 = agent.parameters['statusSwitch2'];
+        var allSwitch = agent.parameters['allSwitch'];
+        var voiceSW1_0 = 'ปิดสวิตซ์'+numberSwitch1+'แล้วค่ะ';
+        var voiceSW1_1 = 'เปิดสวิตซ์'+numberSwitch1+'แล้วค่ะ';
+        var voiceSW2_0 = 'ปิดสวิตซ์'+numberSwitch2+'แล้วค่ะ';
+        var voiceSW2_1 = 'เปิดสวิตซ์'+numberSwitch2+'แล้วค่ะ';
+        
         try {
-            firebaseModel.updateFirebase(database,device,status);
+                //When command all switch
+                if(allSwitch === '0'){
+                    firebaseModel.updateFirebase(database,'1','0');    
+                    firebaseModel.updateFirebase(database,'2','0');    
+                    firebaseModel.updateFirebase(database,'3','0');    
+                    firebaseModel.updateFirebase(database,'4','0');     
+                    dialogflowModel.addResponse(agent,'0','ปิดสวิตซ์ทั้งหมดแล้วค่ะ','เปิดสวิตซ์ทั้งหมดแล้วค่ะ');
+                }else if(allSwitch === '1'){
+                    firebaseModel.updateFirebase(database,'1','1');    
+                    firebaseModel.updateFirebase(database,'2','1');    
+                    firebaseModel.updateFirebase(database,'3','1');    
+                    firebaseModel.updateFirebase(database,'4','1');    
+                    dialogflowModel.addResponse(agent,'1','ปิดสวิตซ์ทั้งหมดแล้วค่ะ','เปิดสวิตซ์ทั้งหมดแล้วค่ะ');
+                }else{
+                    //When command only one switch
+                    if(numberSwitch2 === ''){
+                        if(numberSwitch1 > 0 && numberSwitch1 < 5){
+                            firebaseModel.updateFirebase(database, numberSwitch1, statusSwitch1);
+                        }else{
+                            statusSwitch1 = '0'; 
+                            voiceSW1_0 = 'ไม่มีสวิตซ์นี้ โปรดลองใหม่อีกครั้งค่ะ';        
+                        }
+                        dialogflowModel.addResponse(agent, statusSwitch1, voiceSW1_0, voiceSW1_1);
+                    //When command two switch
+                    }else if(numberSwitch2 !== '' && statusSwitch2 === ''){
+                        if(numberSwitch1 > 0 && numberSwitch1 < 5 && numberSwitch2 > 0 && numberSwitch2 < 5){
+                            firebaseModel.updateFirebase(database, numberSwitch1, statusSwitch1);
+                            dialogflowModel.addResponse(agent, statusSwitch1, voiceSW1_0, voiceSW1_1);
+                            firebaseModel.updateFirebase(database, numberSwitch2, statusSwitch1);
+                            dialogflowModel.addResponse(agent, statusSwitch1, voiceSW2_0, voiceSW2_1);
+                        }else{
+                            statusSwitch1 = '0'; 
+                            voiceSW1_0 = 'หมายเลขสวิตซ์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ';  
+                            dialogflowModel.addResponse(agent, statusSwitch1, voiceSW1_0, voiceSW1_0);
+                        }
+
+                    }else if(numberSwitch2 !== '' && statusSwitch2 !== ''){
+                        if(numberSwitch1 > 0 && numberSwitch1 < 5 && numberSwitch2 > 0 && numberSwitch2 < 5){
+                            firebaseModel.updateFirebase(database, numberSwitch1, statusSwitch1);
+                            dialogflowModel.addResponse(agent, statusSwitch1, voiceSW1_0, voiceSW1_1);
+                            firebaseModel.updateFirebase(database, numberSwitch2, statusSwitch2);
+                            dialogflowModel.addResponse(agent, statusSwitch2, voiceSW2_0, voiceSW2_1);
+                        }else{
+                            statusSwitch1 = '0'; 
+                            voiceSW1_0 = 'หมายเลขสวิตซ์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ'; 
+                            dialogflowModel.addResponse(agent, statusSwitch1, voiceSW1_0, voiceSW1_0);
+                        }
+                    }
+                }
+            } catch (ex) {
+                console.log('Database update error! : '+ex);
+            }
+    }
+/*-----------------------------------------------Old Code--------------------------------------------------------------*/ 
+    function handleBedroomLight(agent){
+        var numberSwitch = '1';
+        var status = agent.parameters['bedroomLight'];
+        try {
+            firebaseModel.updateFirebase(database,numberSwitch,status);
             dialogflowModel.addResponse(agent,status,'ปิดไฟห้องนอนแล้วค่ะ','เปิดไฟห้องนอนแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
@@ -25,10 +94,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     }
 
     function handleLivingroomLight(agent){
-        var device = 'livingroomLight';
-        var status = agent.parameters[device];
+        var numberSwitch = '2';
+        var status = agent.parameters['livingroomLight'];
         try {
-            firebaseModel.updateFirebase(database,device,status);
+            firebaseModel.updateFirebase(database,numberSwitch,status);
             dialogflowModel.addResponse(agent,status,'ปิดไฟห้องนั่งเล่นแล้วค่ะ','เปิดไฟห้องนั่งเล่นแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
@@ -36,10 +105,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     }
 
     function handleFan(agent){
-        var device = 'fan';
-        var status = agent.parameters[device];
+        var numberSwitch = '3';
+        var status = agent.parameters['fan'];
         try {
-            firebaseModel.updateFirebase(database,device,status);
+            firebaseModel.updateFirebase(database,numberSwitch,status);
             dialogflowModel.addResponse(agent,status,'ปิดพัดลมแล้วค่ะ','เปิดพัดลมแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
@@ -47,62 +116,28 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     }
 
     function handleTv(agent){
-        var device = 'tv';
-        var status = agent.parameters[device];
+        var numberSwitch = '4';
+        var status = agent.parameters['tv'];
         try {
-            firebaseModel.updateFirebase(database,device,status);
+            firebaseModel.updateFirebase(database,numberSwitch,status);
             dialogflowModel.addResponse(agent,status,'ปิดทีวีแล้วค่ะ','เปิดทีวีแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
     }
+/*---------------------------------------------------------------------------------------------------------------------*/ 
 
-    function handleAllLights(agent){
-        var device = 'allLights';
-        var status = agent.parameters[device];
-        try {
-            firebaseModel.updateFirebase(database,'bedroomLight',status);
-            firebaseModel.updateFirebase(database,'livingroomLight',status);
-            dialogflowModel.addResponse(agent,status,'ปิดไฟทั้งหมดแล้วค่ะ','เปิดไฟทั้งหมดแล้วค่ะ');
-        } catch (ex) {
-            console.log('Database update error! : '+ex);
-        }
-    }
-
-    function handleElectronicDevices(agent){
-        var device = 'electronicDevices';
-        var status = agent.parameters[device];
-        try {
-            firebaseModel.updateFirebase(database,'fan',status);
-            firebaseModel.updateFirebase(database,'tv',status);
-            dialogflowModel.addResponse(agent,status,'ปิดเครื่องใช้ไฟฟ้าทั้งหมดแล้วค่ะ','เปิดเครื่องใช้ไฟฟ้าทั้งหมดแล้วค่ะ');
-        } catch (ex) {
-            console.log('Database update error! : '+ex);
-        }
-    }
-
-    function handleAllDevices(agent){
-        var device = 'allDevices';
-        var status = agent.parameters[device];
-        try {
-            firebaseModel.updateFirebase(database,'fan',status);
-            firebaseModel.updateFirebase(database,'tv',status);
-            firebaseModel.updateFirebase(database,'bedroomLight',status);
-            firebaseModel.updateFirebase(database,'livingroomLight',status);
-            dialogflowModel.addResponse(agent,status,'ปิดอุปกรณ์ทั้งหมดแล้วค่ะ','เปิดอุปกรณ์ทั้งหมดแล้วค่ะ');
-        } catch (ex) {
-            console.log('Database update error! : '+ex);
-        }
-    }
-
+    //Intent Mapping (intent Name, function name)
     let intenMap = new Map();
+    intenMap.set('switch_Intent', handleSwitch);
+
+/*-----------------------------------------------Old Code--------------------------------------------------------------*/ 
     intenMap.set('bedroomLight_Intent', handleBedroomLight);
     intenMap.set('fan_Intent', handleFan);
     intenMap.set('livingroomLight_Intent', handleLivingroomLight);
     intenMap.set('tv_Intent', handleTv);
-    intenMap.set('allLights_Intent', handleAllLights);
-    intenMap.set('allDevices_Intent', handleAllDevices);
-    intenMap.set('electronicDevices_Intent', handleElectronicDevices);
+/*---------------------------------------------------------------------------------------------------------------------*/ 
+    //Intent map request
     agent.handleRequest(intenMap);
 
 });

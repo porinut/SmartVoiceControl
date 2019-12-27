@@ -10,6 +10,9 @@ module.exports = {
                 case '1':
                     agent.add(voice_1);
                     break;
+                case '88':
+                    agent.add(voice_0);
+                    break;
                 default: 
                     agent.add(default_response);
                     break;

@@ -6,9 +6,9 @@ var time = currentDate.getHours() + ":" + currentDate.getMinutes() + ":" + curre
 var dateTime = date+' @ '+time;
 
 module.exports = {
-    updateFirebase: function(database,device,status) {
-        console.log(device);
-        database.ref('deviceStatus/'+device).set({
+    updateFirebase: function(database,numberSwitch,status) {
+        console.log('switch'+numberSwitch);
+        database.ref('switchStatus/'+'switch'+numberSwitch).set({
             status: status,
             timestamp: dateTime
         });
