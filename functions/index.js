@@ -14,8 +14,45 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
     console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
 /*-----------------------------------------------Function--------------------------------------------------------------*/ 
-    //function Handle Switch
-    function handleSwitch(agent){
+    //function Handle Check Status Switch 
+    function handleCheckStatusSwitch(agent){
+        var number = agent.parameters['number'];
+        var checkStatus = agent.parameters['checkOnOff'];
+        try {
+            if(number === '' && checkStatus !== ''){
+                if(checkStatus === '99'){
+                  // eslint-disable-next-line promise/catch-or-return
+                   var dataa = database.ref('switchStatus/'+'switch1/'+'status').once('value').then((snapshot) => {
+                      // eslint-disable-next-line promise/always-return
+                      var test = (snapshot.val() && snapshot.val().test) || 'Anonymous';
+                    });
+                    agent.add(dataa);
+                    //var dataTest = firebaseModel.readFirebase(database,'1');
+                    //dialogflowModel.addResponse(agent,'0',dataTest,dataTest); 
+                }else if(checkStatus === '1'){
+                    for(var i=1;i++;i<5){
+                        var data = firebaseModel.readFirebase(database,i);
+                        if(data === '1'){
+                            dialogflowModel.addResponse(agent,status,'สวิตซ์'+number+'ปิดอยู่ค่ะ','สวิตซ์'+number+'เปิดอยู่ค่ะ'); 
+                        }
+                    }
+                }else{
+                    dialogflowModel.addResponse(agent,'88','มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ',''); 
+                }
+            }else if(number !== ''){
+                var status = firebaseModel.readFirebase(database,number);
+                dialogflowModel.addResponse(agent,status,'สวิตซ์'+number+'ปิดอยู่ค่ะ','สวิตซ์'+number+'เปิดอยู่ค่ะ'); 
+            }else{
+                dialogflowModel.addResponse(agent,'88','มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ',''); 
+            }
+        } catch (ex) {
+            console.log('Database update error! : '+ex);
+        }
+    }
+
+
+    //function Handle On Off Switch
+    function handleOnOffSwitch(agent){
         //Parameter name in dialogflow 
         var numberSwitch1 = agent.parameters['numberSwitch1'];
         var numberSwitch2 = agent.parameters['numberSwitch2']; 
@@ -129,7 +166,9 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
     //Intent Mapping (intent Name, function name)
     let intenMap = new Map();
-    intenMap.set('switch_Intent', handleSwitch);
+   
+    intenMap.set('check_switch_Intent',  handleCheckStatusSwitch);
+    intenMap.set('onoff_switch_Intent', handleOnOffSwitch);
 
 /*-----------------------------------------------Old Code--------------------------------------------------------------*/ 
     intenMap.set('bedroomLight_Intent', handleBedroomLight);

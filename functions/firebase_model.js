@@ -12,6 +12,12 @@ module.exports = {
             status: status,
             timestamp: dateTime
         });
+    },
+
+    readFirebase: function(database,numberSwitch) {
+        //var userId = firebase.auth().currentUser.uid;
+        console.log('switch'+numberSwitch);
+        return database.ref('switchStatus/'+'switch1/'+'status').once('value');
     }
 };
 
