@@ -32,7 +32,29 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
                     throw new Error("Profile doesn't exist");
                 }
                 });
-        } 
+        }else if(checkStatus === '1' && number !== ''){
+            return database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
+                if (snapshot.exists){
+                    var data = snapshot.child('status').val();
+                    console.log('return ok => '+data);
+                    agent.add('read data ok => '+data);
+                    return data;
+                }else{
+                    throw new Error("Profile doesn't exist");
+                }
+                });
+        }else{
+            return database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
+                if (snapshot.exists){
+                    var data = snapshot.child('status').val();
+                    console.log('return ok => '+data);
+                    agent.add('read data ok => '+data);
+                    return data;
+                }else{
+                    throw new Error("Profile doesn't exist");
+                }
+                });
+        }
         
     }
 
