@@ -14,30 +14,29 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
     console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
 /*-----------------------------------------------Function--------------------------------------------------------------*/ 
+    
+
     //function Handle Check Status Switch 
     function handleCheckStatusSwitch(agent){
         var number = agent.parameters['number'];
         var checkStatus = agent.parameters['checkOnOff'];
+ 
         if(checkStatus === '99'){
-            agent.add('Step 1 function ok');
-            aa();
-            agent.add('Last Step function ok');
-        }
+            return database.ref('switchStatus/switch1').once('value').then((snapshot) => {
+                if (snapshot.exists){
+                    var data = snapshot.child('status').val();
+                    console.log('return ok => '+data);
+                    agent.add('read data ok => '+data);
+                    return data;
+                }else{
+                    throw new Error("Profile doesn't exist");
+                }
+                });
+        } 
         
     }
 
-    function aa(){
-        /*
-        agent.add("aa");
-        var ref = database.ref("bigData/data/smallData");
-        var reData = ref.on("value", snap => {
-            console.log(snap.val());
-            return recieveData = snap.val();
-        });   
-        agent.add(reData);
-        */
-    }
-   /*---------------------------------------------------------------------------------------------------------  */
+   /*----------------------------------------------------------------------------------------------------  */
     //function Handle On Off Switch
     function handleOnOffSwitch(agent){
         //Parameter name in dialogflow 
@@ -154,7 +153,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     //Intent Mapping (intent Name, function name)
     let intenMap = new Map();
    
-    intenMap.set('check_switch_Intent',  handleCheckStatusSwitch);
+    intenMap.set('check_switch_Intent', handleCheckStatusSwitch);
     intenMap.set('onoff_switch_Intent', handleOnOffSwitch);
 
 /*-----------------------------------------------Old Code--------------------------------------------------------------*/ 

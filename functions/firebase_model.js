@@ -15,9 +15,17 @@ module.exports = {
     },
 
     readFirebase: function(database,numberSwitch) {
-        //var userId = firebase.auth().currentUser.uid;
-        console.log('switch'+numberSwitch);
-        return database.ref('switchStatus/'+'switch1/'+'status').once('value');
+    
+        return database.ref('bigData/data').once('value').then((snapshot) => {
+            if (snapshot.exists){
+                var data = snapshot.child('smallData').val();
+                console.log('return ok => '+data);
+                agent.add('read data ok => '+data);
+                return data;
+            }else{
+                throw new Error("Profile doesn't exist");
+            }
+        });
     }
 };
 
