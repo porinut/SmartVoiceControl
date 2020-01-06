@@ -3,6 +3,7 @@
 const functions = require('firebase-functions');
 const {WebhookClient} = require('dialogflow-fulfillment');
 var admin = require('firebase-admin');
+
 admin.initializeApp(functions.config().firebase);
 var database = admin.database();
 //Import fucntion
@@ -50,6 +51,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
 
     intenMap.set('onoff_switch_Intent', handleOnOffSwitch_map);
     intenMap.set('check_switch_Intent', handleCheckStatusSwitch_map);
+    //intenMap.set('check_opening_Intent', handleCheckOpeningTime_map);
 
     intenMap.set('bedroomLight_Intent', handleBedroomLight_map);
     intenMap.set('livingroomLight_Intent', handleLivingroomLight_map);

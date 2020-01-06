@@ -1,16 +1,17 @@
 'use strict';
 
-var currentDate = new Date();
-var date = currentDate.getFullYear()+'-'+(currentDate.getMonth()+1)+'-'+currentDate.getDate();
-var time = currentDate.getHours() + ":" + currentDate.getMinutes() + ":" + currentDate.getSeconds();
-var dateTime = date+' @ '+time;
+var moment = require('moment');
+var now = moment();
+var formatted = now.format('YYYY-MM-DDTHH:mm:ss-07:00');
+var timeStamp = moment.utc(formatted).format('YYYY-MM-DD HH:mm:ss A');
 
 module.exports = {
     updateFirebase: function(database,numberSwitch,status) {
         console.log('switch'+numberSwitch);
+        console.log(timeStamp);
         database.ref('switchStatus/'+'switch'+numberSwitch).set({
             status: status,
-            timestamp: dateTime
+            timestamp: timeStamp
         });
     }
 }
