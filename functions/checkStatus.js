@@ -1,0 +1,56 @@
+'use strict';
+
+module.exports = {
+    handleCheckStatusSwitch: function(agent,database){
+        console.log('Function handleCheckStatusSwitch is running..')
+        var number = agent.parameters['number'];
+        var checkStatus = agent.parameters['checkOnOff'];
+        try {
+            if(checkStatus === '1' && number !== ''){
+                console.log('Condition => checkStatus === 99 && number !== ');
+                return database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
+                    if (!snapshot || !snapshot.exists) {
+                        throw new Error("snapshot doesn't exist")
+                    }   
+                    var data = snapshot.child('status').val();
+                    console.log('Retrieve child ok => '+data);
+                    if(data === '1'){
+                        agent.add('สวิตซ์'+number+'เปิดอยู่ค่ะ');
+                        console.log('Responsed to dialogflow => '+data);
+                    }else{
+                        agent.add('สวิตซ์'+number+'ปิดอยู่ค่ะ');
+                        console.log('Responsed to dialogflow => '+data);
+                    }
+                    return true;
+                });
+
+            }else if(checkStatus === '1' && number === ''){
+                console.log('Condition => checkStatus === 1 && number === ');
+                return database.ref('switchStatus').once('value', (snapshot) => {
+                    if (!snapshot || !snapshot.exists) {
+                        throw new Error("snapshot doesn't exist")
+                    }     
+                    var count = 1;
+                    snapshot.forEach((childSnapshot) => {
+                        var childKey = childSnapshot.key;
+                        var childData = childSnapshot.child('status').val();
+                        console.log('childKey => '+childKey);
+                        console.log('childData => '+childData);
+                        if(childData === '1'){
+                            agent.add('สวิตซ์'+count+'เปิดอยู่ค่ะ');
+                            console.log('Responsed to dialogflow => '+childData);
+                        }else{
+                            agent.add('สวิตซ์'+count+'ปิดอยู่ค่ะ');
+                            console.log('Responsed to dialogflow => '+childData);
+                        }
+                        count++;
+                    });
+                    return true;
+                });
+            }
+            console.log('Function handleCheckStatusSwitch is run successfull');   
+        } catch (ex) {
+            console.log('Database update error! : '+ex);
+        }
+    }
+}
