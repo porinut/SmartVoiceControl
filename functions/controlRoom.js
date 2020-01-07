@@ -8,7 +8,7 @@ module.exports = {
         var status = agent.parameters['bedroomLight'];
         try {
             firebaseModel.updateFirebase(database,numberSwitch,status);
-            dialogflowModel.addResponse(agent,status,'ปิดไฟห้องนอนแล้วค่ะ','เปิดไฟห้องนอนแล้วค่ะ');
+            dialogflowModel.addResponse(agent,status,'ปิดไฟห้องนอนแล้วเด้อ','เปิดไฟห้องนอนแล้วค่ะ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
