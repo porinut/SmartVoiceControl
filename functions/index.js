@@ -10,6 +10,7 @@ var database = admin.database();
 const onOffSwitch = require('./onOffSwitch');
 const checkStatus = require('./checkStatus');
 const controlRoom = require('./controlRoom');
+const openingTime = require('./openingTime');
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
     const agent = new WebhookClient({ request, response});
@@ -24,6 +25,10 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
    
     function handleCheckStatusSwitch_map(agent){
         return checkStatus.handleCheckStatusSwitch(agent,database);
+    }
+    
+    function handleCheckOpeningTime_map(agent){
+        return openingTime.handleCheckOpeningTime(agent,database);
     }
    
 /*---------------------------------------------------------------------------------------------------------------------*/ 
@@ -50,8 +55,8 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     let intenMap = new Map();
 
     intenMap.set('onoff_switch_Intent', handleOnOffSwitch_map);
-    intenMap.set('check_switch_Intent', handleCheckStatusSwitch_map);
-    //intenMap.set('check_opening_Intent', handleCheckOpeningTime_map);
+    intenMap.set('check_status_Intent', handleCheckStatusSwitch_map);
+    intenMap.set('check_opening_Intent', handleCheckOpeningTime_map);
 
     intenMap.set('bedroomLight_Intent', handleBedroomLight_map);
     intenMap.set('livingroomLight_Intent', handleLivingroomLight_map);

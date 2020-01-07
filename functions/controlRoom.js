@@ -9,6 +9,7 @@ module.exports = {
         try {
             firebaseModel.updateFirebase(database,numberSwitch,status);
             dialogflowModel.addResponse(agent,status,'ปิดไฟห้องนอนแล้วค่ะ','เปิดไฟห้องนอนแล้วค่ะ');
+            console.log('Controlled bedroomLight! ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
@@ -19,6 +20,7 @@ module.exports = {
         try {
             firebaseModel.updateFirebase(database,numberSwitch,status);
             dialogflowModel.addResponse(agent,status,'ปิดไฟห้องนั่งเล่นแล้วค่ะ','เปิดไฟห้องนั่งเล่นแล้วค่ะ');
+            console.log('Controlled LivingroomLight! ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
@@ -29,6 +31,7 @@ module.exports = {
         try {
             firebaseModel.updateFirebase(database,numberSwitch,status);
             dialogflowModel.addResponse(agent,status,'ปิดพัดลมแล้วค่ะ','เปิดพัดลมแล้วค่ะ');
+            console.log('Controlled fan! ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }
@@ -39,6 +42,7 @@ module.exports = {
         try {
             firebaseModel.updateFirebase(database,numberSwitch,status);
             dialogflowModel.addResponse(agent,status,'ปิดทีวีแล้วค่ะ','เปิดทีวีแล้วค่ะ');
+            console.log('Controlled TV! ');
         } catch (ex) {
             console.log('Database update error! : '+ex);
         }

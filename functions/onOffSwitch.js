@@ -4,7 +4,8 @@ const dialogflowModel = require('./dialogflow_model');
 
 module.exports = {
     handleOnOffSwitch : function (agent,database) {
-        console.log('Function handleOnOffSwitch is running..')
+        console.log('------------------------------------------------------');
+        console.log('Function handleOnOffSwitch is running..');
         //Parameter name in dialogflow 
         var numberSwitch1 = agent.parameters['numberSwitch1'];
         var numberSwitch2 = agent.parameters['numberSwitch2']; 
@@ -80,6 +81,8 @@ module.exports = {
                         }
                     }
                 }
+                console.log('Function handleOnOffSwitch run success!');
+                console.log('------------------------------------------------------');
             } catch (ex) {
                 console.log('Database update error! : '+ex);
             }
