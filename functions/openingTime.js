@@ -1,9 +1,7 @@
 /* eslint-disable consistent-return */
 'use strict';
 var moment = require('moment');
-var now = moment();
-var formatted = now.format('YYYY-MM-DDTHH:mm:ss-07:00');
-var timeNow= moment.utc(formatted).format('HH:mm:ss DD-MM-YYYY');
+
 
 module.exports = {
     handleCheckOpeningTime: function(agent,database) {
@@ -11,6 +9,9 @@ module.exports = {
         console.log('Function handleCheckOpeningTime is running..')
         var number = agent.parameters['number'];
         var openingTime = agent.parameters['openingTime_entity'];
+        var now = moment();
+        var formatted = now.format('YYYY-MM-DDTHH:mm:ss-07:00');
+        var timeNow= moment.utc(formatted).format('HH:mm:ss DD-MM-YYYY');
         try {
 
             if(number !== '' && number > 0 && number < 5){
@@ -43,14 +44,23 @@ module.exports = {
                         var status = snapshot.child('status').val();
                         var timestamp = snapshot.child('timestamp').val();
                         console.log('Retrieve child ok => '+status+'->'+timestamp);
+                        
+                        var ms = moment(timeNow,"HH:mm:ss DD-MM-YYYY").diff(moment(timestamp,"HH:mm:ss DD-MM-YYYY"));
+                        var d = moment.duration(ms);
+                        var s = Math.floor(d.asHours()) + moment.utc(ms).format(" ชั่วโมง m นาที s วินาที");
+                        
                         if(status === '1'){
                             agent.add('สวิตซ์'+number+'เปิดอยู่ค่ะ');
-                            agent.add('เปิดมาแล้ว ');
-                            console.log('Responsed to dialogflow => '+status+'->'+timestamp);
+                            console.log('Time Now =>'+timeNow);
+                            console.log('Timestamp'+timestamp);
+                            agent.add('เปิดมาแล้ว '+s);
+                            console.log('Responsed to dialogflow => '+s);
                         }else{
                             agent.add('สวิตซ์'+number+'ปิดอยู่ค่ะ');
-                            agent.add('ปิดมาแล้ว ');
-                            console.log('Responsed to dialogflow => '+status+'->'+timestamp);
+                            console.log('Time Now =>'+timeNow);
+                            console.log('Timestamp'+timestamp);
+                            agent.add('ปิดมาแล้ว '+s);
+                            console.log('Responsed to dialogflow => '+s);
                         }
                         console.log('Function handleCheckOpeningTime is run successfull'); 
                         console.log('------------------------------------------------------'); 
