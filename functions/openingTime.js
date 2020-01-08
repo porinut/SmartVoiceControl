@@ -52,13 +52,15 @@ module.exports = {
                         if(status === '1'){
                             agent.add('สวิตซ์'+number+'เปิดอยู่ค่ะ');
                             console.log('Time Now =>'+timeNow);
-                            console.log('Timestamp'+timestamp);
+                            console.log('Timestamp =>'+timestamp);
+                            console.log('Time difference =>'+s);
                             agent.add('เปิดมาแล้ว '+s);
                             console.log('Responsed to dialogflow => '+s);
                         }else{
                             agent.add('สวิตซ์'+number+'ปิดอยู่ค่ะ');
                             console.log('Time Now =>'+timeNow);
                             console.log('Timestamp'+timestamp);
+                            console.log('Time difference =>'+s);
                             agent.add('ปิดมาแล้ว '+s);
                             console.log('Responsed to dialogflow => '+s);
                         }
@@ -67,6 +69,7 @@ module.exports = {
                         return true;
                     });
                 }else{
+                    console.log('var Opening error');
                     return agent.add('โปรดลองใหม่อีกครั้งค่ะ');
                 }
             }else{   
