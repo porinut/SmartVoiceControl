@@ -13,6 +13,12 @@ module.exports = {
                 case '88':
                     agent.add(voice_0);
                     break;
+                case '00':
+                    agent.add(voice_0);
+                    break;
+                case '11':
+                    agent.add(voice_1);
+                    break;
                 default: 
                     agent.add(default_response);
                     break;

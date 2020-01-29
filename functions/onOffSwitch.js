@@ -12,30 +12,30 @@ module.exports = {
         var statusSwitch1 = agent.parameters['statusSwitch1'];
         var statusSwitch2 = agent.parameters['statusSwitch2'];
         var allSwitch = agent.parameters['allSwitch'];
-        var voiceSW1_0 = 'ปิดสวิตซ์'+numberSwitch1+'แล้วค่ะ';
-        var voiceSW1_1 = 'เปิดสวิตซ์'+numberSwitch1+'แล้วค่ะ';
-        var voiceSW2_0 = 'ปิดสวิตซ์'+numberSwitch2+'แล้วค่ะ';
-        var voiceSW2_1 = 'เปิดสวิตซ์'+numberSwitch2+'แล้วค่ะ';
+        var voiceSW1_0 = 'ปิดสวิตช์'+numberSwitch1+'แล้วค่ะ';
+        var voiceSW1_1 = 'เปิดสวิตช์'+numberSwitch1+'แล้วค่ะ';
+        var voiceSW2_0 = 'ปิดสวิตช์'+numberSwitch2+'แล้วค่ะ';
+        var voiceSW2_1 = 'เปิดสวิตช์'+numberSwitch2+'แล้วค่ะ';
         
         try {
             //When command all switch
-            if(allSwitch === '0'){
+            if(allSwitch === '0' || allSwitch === 0){
                 console.log('Condition if allSwitch === 0 ');   
                 firebaseModel.updateFirebase(database,'1','0'); 
                 firebaseModel.updateFirebase(database,'2','0');
                 firebaseModel.updateFirebase(database,'3','0'); 
                 firebaseModel.updateFirebase(database,'4','0');
                 console.log('Updated firebase!'); 
-                dialogflowModel.addResponse(agent,'0','ปิดสวิตซ์ทั้งหมดแล้วค่ะ','เปิดสวิตซ์ทั้งหมดแล้วค่ะ');
+                dialogflowModel.addResponse(agent,'0','ปิดสวิตช์ทั้งหมดแล้วค่ะ','เปิดสวิตช์ทั้งหมดแล้วค่ะ');
                 console.log('Responsed to dialogflow!'); 
-            }else if(allSwitch === '1'){
+            }else if(allSwitch === '1' || allSwitch === 1){
                 console.log('Condition if allSwitch === 1 '); 
                 firebaseModel.updateFirebase(database,'1','1');    
                 firebaseModel.updateFirebase(database,'2','1');    
                 firebaseModel.updateFirebase(database,'3','1');    
                 firebaseModel.updateFirebase(database,'4','1'); 
                 console.log('Updated firebase!');    
-                dialogflowModel.addResponse(agent,'1','ปิดสวิตซ์ทั้งหมดแล้วค่ะ','เปิดสวิตซ์ทั้งหมดแล้วค่ะ');
+                dialogflowModel.addResponse(agent,'1','ปิดสวิตช์ทั้งหมดแล้วค่ะ','เปิดสวิตช์ทั้งหมดแล้วค่ะ');
                 console.log('Responsed to dialogflow!'); 
             }else{
                     //When command only one switch
@@ -45,7 +45,7 @@ module.exports = {
                         console.log('Updated firebase!');
                     }else{
                         statusSwitch1 = '0'; 
-                        voiceSW1_0 = 'ไม่มีสวิตซ์นี้ โปรดลองใหม่อีกครั้งค่ะ';        
+                        voiceSW1_0 = 'ไม่มีสวิตช์นี้ โปรดลองใหม่อีกครั้งค่ะ';        
                     }
                     dialogflowModel.addResponse(agent, statusSwitch1, voiceSW1_0, voiceSW1_1);
                     console.log('Responsed to dialogflow!'); 
@@ -60,7 +60,7 @@ module.exports = {
                         console.log('Responsed to dialogflow!'); 
                     }else{
                         statusSwitch1 = '0'; 
-                        voiceSW1_0 = 'หมายเลขสวิตซ์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ';  
+                        voiceSW1_0 = 'หมายเลขสวิตช์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ';  
                         dialogflowModel.addResponse(agent, statusSwitch1, voiceSW1_0, voiceSW1_0);
                         console.log('Responsed to dialogflow!'); 
                     }
@@ -75,7 +75,7 @@ module.exports = {
                             console.log('Responsed to dialogflow!'); 
                         }else{
                             statusSwitch1 = '0'; 
-                            voiceSW1_0 = 'หมายเลขสวิตซ์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ'; 
+                            voiceSW1_0 = 'หมายเลขสวิตช์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ'; 
                             dialogflowModel.addResponse(agent, statusSwitch1, voiceSW1_0, voiceSW1_0);
                             console.log('Responsed to dialogflow!'); 
                         }

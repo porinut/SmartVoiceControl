@@ -11,7 +11,7 @@ module.exports = {
         var openingTime = agent.parameters['openingTime_entity'];
         var now = moment();
         var formatted = now.format('YYYY-MM-DDTHH:mm:ss-07:00');
-        var timeNow= moment.utc(formatted).format('HH:mm:ss DD-MM-YYYY');
+        var timeNow = moment.utc(formatted).format('HH:mm:ss DD-MM-YYYY');
         try {
 
             if(number !== '' && number > 0 && number < 5){
@@ -22,15 +22,20 @@ module.exports = {
                         }   
                         var status = snapshot.child('status').val();
                         var timestamp = snapshot.child('timestamp').val();
+                        var timestampFormattted = moment.utc(timestamp).format('HH:mm:ss DD-MM-YYYY');
+
                         console.log('Retrieve child ok => '+status+'->'+timestamp);
-                        if(status === '1'){
-                            agent.add('สวิตซ์'+number+'เปิดอยู่ค่ะ');
-                            agent.add('เปิดเมื่อ '+timestamp);
-                            console.log('Responsed to dialogflow => '+status+'->'+timestamp);
+                        if(status === '1' || status === 1){
+                            agent.add('สวิตช์'+number+'เปิดอยู่ค่ะ');
+                            agent.add('เปิดเมื่อ '+timestampFormattted);
+                            console.log('Responsed to dialogflow => '+status+'->'+timestampFormattted);
+                        }else if (status === '0' || status === 0){
+                            agent.add('สวิตช์'+number+'ปิดอยู่ค่ะ');
+                            agent.add('ปิดเมื่อ '+timestampFormattted);
+                            console.log('Responsed to dialogflow => '+status+'->'+timestampFormattted);
                         }else{
-                            agent.add('สวิตซ์'+number+'ปิดอยู่ค่ะ');
-                            agent.add('ปิดเมื่อ '+timestamp);
-                            console.log('Responsed to dialogflow => '+status+'->'+timestamp);
+                             console.log('something error');
+                            agent.add('มีบางอย่างผิดพลาด โปรดลองใหม่อีกครั้งค่ะ');
                         }
                         console.log('Function handleCheckOpeningTime is run successfull'); 
                         console.log('------------------------------------------------------'); 
@@ -44,25 +49,29 @@ module.exports = {
                         var status = snapshot.child('status').val();
                         var timestamp = snapshot.child('timestamp').val();
                         console.log('Retrieve child ok => '+status+'->'+timestamp);
-                        
-                        var ms = moment(timeNow,"HH:mm:ss DD-MM-YYYY").diff(moment(timestamp,"HH:mm:ss DD-MM-YYYY"));
+                        var timestampFormattted = moment.utc(timestamp).format('HH:mm:ss DD-MM-YYYY');
+
+                        var ms = moment(timeNow,"HH:mm:ss DD-MM-YYYY").diff(moment(timestampFormattted,"HH:mm:ss DD-MM-YYYY"));
                         var d = moment.duration(ms);
                         var s = Math.floor(d.asHours()) + moment.utc(ms).format(" ชั่วโมง m นาที s วินาที");
                         
-                        if(status === '1'){
-                            agent.add('สวิตซ์'+number+'เปิดอยู่ค่ะ');
+                        if(status === '1' || status === 1){
+                            agent.add('สวิตช์'+number+'เปิดอยู่ค่ะ');
                             console.log('Time Now =>'+timeNow);
-                            console.log('Timestamp =>'+timestamp);
+                            console.log('Timestamp =>'+timestampFormattted);
                             console.log('Time difference =>'+s);
                             agent.add('เปิดมาแล้ว '+s);
                             console.log('Responsed to dialogflow => '+s);
-                        }else{
-                            agent.add('สวิตซ์'+number+'ปิดอยู่ค่ะ');
+                        }else if (status === '0' || status === 0){
+                            agent.add('สวิตช์'+number+'ปิดอยู่ค่ะ');
                             console.log('Time Now =>'+timeNow);
-                            console.log('Timestamp'+timestamp);
+                            console.log('Timestamp'+timestampFormattted);
                             console.log('Time difference =>'+s);
                             agent.add('ปิดมาแล้ว '+s);
                             console.log('Responsed to dialogflow => '+s);
+                        }else{
+                            console.log('something error');
+                            agent.add('มีบางอย่างผิดพลาด โปรดลองใหม่อีกครั้งค่ะ');
                         }
                         console.log('Function handleCheckOpeningTime is run successfull'); 
                         console.log('------------------------------------------------------'); 
@@ -70,11 +79,11 @@ module.exports = {
                     });
                 }else{
                     console.log('var Opening error');
-                    return agent.add('โปรดลองใหม่อีกครั้งค่ะ');
+                    return agent.add('มีบางอย่างผิดพลาด โปรดลองใหม่อีกครั้งค่ะ');
                 }
             }else{   
                 console.log('Number switch error');
-                return agent.add('ไม่มีสวิซนี้ค่ะ โปรดลองใหม่อีกครั้งค่ะ');
+                return agent.add('ไม่มีสวิตช์นี้ค่ะ โปรดลองใหม่อีกครั้งค่ะ');
             }
          
         } catch (ex) {
