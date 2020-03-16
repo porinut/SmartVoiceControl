@@ -1,8 +1,8 @@
 /* eslint-disable consistent-return */
 'use strict';
 var moment = require('moment');
-const firebaseModel = require('./firebase_model');
-const dialogflowModel = require('./dialogflow_model')
+const dialogflowModel = require('./dialogflow_model');
+const globalFunction = require('./globalFunction');
 
 function timeFuture(time,date){
     //Date and Time formatted for convert to milliSec
@@ -46,6 +46,27 @@ function timeNow(){
     return timeNow;
 }
 
+function updateFirebase(database,numberSwitch,status,timer){
+    var now = moment();
+    var formatted = now.format('YYYY-MM-DDTHH:mm:ss-07:00');
+    var timeStamp = moment.utc(formatted).format('YYYY-MM-DDTHH:mm:ss');
+    console.log('switch'+numberSwitch+' : '+status);
+    console.log(timeStamp);
+    database.ref('switchStatus/'+'switch'+numberSwitch).update({
+        status: status,
+        timestamp: timeStamp,
+        timer: timer
+    });
+}
+
+function updateTimer(database,numberSwitch,timer){
+    console.log('update varTimer : '+timer);
+    database.ref('switchStatus/'+'switch'+numberSwitch).update({
+        timer: timer
+    });
+}
+
+
 module.exports = {
 
     handleSetTimer: function(agent,database) {
@@ -54,13 +75,10 @@ module.exports = {
         var number = agent.parameters['number'];
         var time = agent.parameters['time'];
         var date = agent.parameters['date'];
-        var setTimer = agent.parameters['setTimer_entity'];
+        var setTimer = agent.parameters['setTimer_entity'].toString().replace(/^.*(\d+).*$/i,'$1');
 
-        if(number !== '' && number < 1 || number !== '' && number > 4){
-            console.log('Number switch error');
-            console.log('Responsed to dialogflow');
-            return agent.add('ไม่มีสวิตช์นี้ค่ะ โปรดลองใหม่อีกครั้งค่ะ');
-        }
+        globalFunction.checkNumber(agent,number); //Check Number 1,2,3,4
+
         if(number === '' && setTimer === '0'){
             setTimer = '00';
         }else if(number === '' && setTimer === '1'){
@@ -86,12 +104,29 @@ module.exports = {
                     var voice_11 = "ตั้งเวลาเปิดสวิตช์ทั้งหมดเวลา " +timeResDialogflow(time)+" วันที่ "+dateResDialogflow(date)+" เรียบร้อยแล้วค่ะ";
                     console.log('Case turn of');
                     console.log('Difference Time => '+ ms);
+
                     if(setTimer === 1 || setTimer === '1' || setTimer === 0 || setTimer === '0'){
-                        
+                        updateTimer(database,number,true);
+                  
                         setTimeout(() => {
-                            firebaseModel.updateFirebase(database,number,setTimer);
-                            console.log('Updated Firebase! at '+timeNow());
+                                database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
+                                if (!snapshot || !snapshot.exists) {
+                                    throw new Error("snapshot doesn't exist");
+                                }   
+                                var timer = snapshot.child('timer').val();
+                                console.log('Now varTimer : '+timer);
+                                if(timer === true){
+                                    updateFirebase(database,number,setTimer,false);
+                                    console.log('Updated Firebase! at '+timeNow());
+                                }else{
+                                    console.log('Timer is cancelled');
+                                }
+                                return true;
+                            }).catch(error => { 
+                                console.log(error) 
+                            });
                         }, ms);
+
                         dialogflowModel.addResponse(agent,setTimer,voice_0,voice_1);
                         console.log('Set timer success');
                         //agent.add('ตั้งเวลาปิดสวิตช์ '+number+' เวลา '+timeResDialogflow(time)+' วันที่ '+dateResDialogflow(date)+' เรียบร้อยแล้วค่ะ');
@@ -102,14 +137,33 @@ module.exports = {
                         if(setTimer === 11 || setTimer === '11'){
                             setT = '1';
                         }
+
                         console.log('setTime ='+setT);
+                        updateTimer(database,number,true);
+                  
                         setTimeout(() => {
-                                firebaseModel.updateFirebase(database,'1',setT);
-                                firebaseModel.updateFirebase(database,'2',setT);
-                                firebaseModel.updateFirebase(database,'3',setT);
-                                firebaseModel.updateFirebase(database,'4',setT);
-                                console.log('Updated Firebase! at '+timeNow());
+                            database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
+                                if (!snapshot || !snapshot.exists) {
+                                    throw new Error("snapshot doesn't exist");
+                                }   
+                                var timer = snapshot.child('timer').val();
+                                console.log('Now varTimer : '+timer);
+                                if(timer === true) {
+                                    updateFirebase(database,'1',setT,false);
+                                    updateFirebase(database,'2',setT,false);
+                                    updateFirebase(database,'3',setT,false);
+                                    updateFirebase(database,'4',setT,false);
+                                    console.log('set varTimer : false');
+                                    console.log('Updated Firebase! at '+timeNow());
+                                }else{
+                                    console.log('Timer is cancelled');
+                                }
+                                return true;
+                            }).catch(error => { 
+                                console.log(error) 
+                            });
                         }, ms);
+
                         dialogflowModel.addResponse(agent,setT,voice_00,voice_11);
                         console.log('Set timer success');
                         //agent.add('ตั้งเวลาปิดสวิตช์ '+number+' เวลา '+timeResDialogflow(time)+' วันที่ '+dateResDialogflow(date)+' เรียบร้อยแล้วค่ะ');
@@ -127,15 +181,26 @@ module.exports = {
             console.log('------------------------------------------------------');
             console.log('Function handleSetTimer is run successfull');
         } catch (ex) {
+            console.log('Dialog Error!!');
             console.log('Database update error! : '+ex);
+            return agent.add('มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ')
         }
     }
 }
 
 
-
-
 /*
+module.exports = {
+
+    handleSetTimer: function(agent,database) {
+        console.log('------------------------------------------------------');
+        console.log('Function handleSetTimer is running..');
+        var number = agent.parameters['number'];
+        var time = agent.parameters['time'];
+        var date = agent.parameters['date'];
+        var setTimer = agent.parameters['setTimer_entity'];
+                try{
+                    var ms = 0;
                     switch(setTimer){
                         case '0':
                             console.log('Case turn of');
@@ -200,4 +265,13 @@ module.exports = {
                             break;
                     }
 
-    */
+        } catch (ex) {
+            console.log('Dialog Error!!');
+            console.log('Database update error! : '+ex);
+            return agent.add('มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ')
+        }
+    }
+}
+
+*/
+    

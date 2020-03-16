@@ -19,9 +19,7 @@
     "dialogflow-fulfillment": "^0.5.0",
     "firebase-admin": "^8.0.0",
     "firebase-functions": "^3.1.0",
-    "moment": "^2.24.0",
-    "youtube-search": "^1.1.4",
-    "youtube-search-promise": "^1.0.3"
+    "moment": "^2.24.0"
   },
   "devDependencies": {
     "eslint": "^5.16.0",

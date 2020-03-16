@@ -3,6 +3,8 @@
 const functions = require('firebase-functions');
 const { WebhookClient } = require('dialogflow-fulfillment');
 var admin = require('firebase-admin');
+const {dialogflow,DialogflowConversation} = require('actions-on-google');
+process.env.DEBUG = 'dialogflow:debug'; 
 
 admin.initializeApp(functions.config().firebase);
 var database = admin.database();
@@ -12,8 +14,8 @@ const checkStatus = require('./checkStatus');
 const controlRoom = require('./controlRoom');
 const openingTime = require('./openingTime');
 const setTimer = require('./setTimer');
-const calulator = require('./calculator');
-const youtube = require('./youtube');
+
+
 
 exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
     const agent = new WebhookClient({ request, response });
@@ -38,12 +40,14 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         setTimer.handleSetTimer(agent, database);
     }
 
-    function handleCalculator_map(agent) {
-        calulator.handleCalculate(agent);
-    }
 
     function handleYoutube_map(agent) {
-        youtube.playYoutube(agent);
+        let conv = agent.conv();
+        conv.ask(new Permission({
+          context: 'To give results in your area',
+          permissions: 'DEVICE_PRECISE_LOCATION',
+        }))
+        agent.add(conv);
     }
 
     /*---------------------------------------------------------------------------------------------------------------------*/
@@ -73,7 +77,6 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     intenMap.set('check_status_Intent', handleCheckStatusSwitch_map);
     intenMap.set('check_opening_Intent', handleCheckOpeningTime_map);
     intenMap.set('set_timer_Intent', handleSetTimer_map);
-    intenMap.set('calculator_Intent', handleCalculator_map);
     intenMap.set('youtube_Intent', handleYoutube_map);
 
     intenMap.set('bedroomLight_Intent', handleBedroomLight_map);

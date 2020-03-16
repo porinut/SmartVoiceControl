@@ -1,6 +1,7 @@
 'use strict';
 const firebaseModel = require('./firebase_model');
 const dialogflowModel = require('./dialogflow_model');
+const globalFunction = require('./globalFunction');
 
 module.exports = {
     handleOnOffSwitch : function (agent,database) {
@@ -9,17 +10,20 @@ module.exports = {
         //Parameter name in dialogflow 
         var numberSwitch1 = agent.parameters['numberSwitch1'];
         var numberSwitch2 = agent.parameters['numberSwitch2']; 
-        var statusSwitch1 = agent.parameters['statusSwitch1'];
-        var statusSwitch2 = agent.parameters['statusSwitch2'];
-        var allSwitch = agent.parameters['allSwitch'];
+        var statusSwitch1 = agent.parameters['statusSwitch1'].toString().replace(/^.*(\d+).*$/i,'$1');
+        var statusSwitch2 = agent.parameters['statusSwitch2'].toString().replace(/^.*(\d+).*$/i,'$1');
+        //var all = agent.parameters['allSwitch'];
+        var allSwitch = agent.parameters['allSwitch'].toString().replace(/^.*(\d+).*$/i,'$1');
         var voiceSW1_0 = 'ปิดสวิตช์'+numberSwitch1+'แล้วค่ะ';
         var voiceSW1_1 = 'เปิดสวิตช์'+numberSwitch1+'แล้วค่ะ';
         var voiceSW2_0 = 'ปิดสวิตช์'+numberSwitch2+'แล้วค่ะ';
         var voiceSW2_1 = 'เปิดสวิตช์'+numberSwitch2+'แล้วค่ะ';
-        
+
+
+      
         try {
             //When command all switch
-            if(allSwitch === '0' || allSwitch === 0){
+            if(allSwitch === '0' || allSwitch === 0 ){
                 console.log('Condition if allSwitch === 0 ');   
                 firebaseModel.updateFirebase(database,'1','0'); 
                 firebaseModel.updateFirebase(database,'2','0');
@@ -38,6 +42,7 @@ module.exports = {
                 dialogflowModel.addResponse(agent,'1','ปิดสวิตช์ทั้งหมดแล้วค่ะ','เปิดสวิตช์ทั้งหมดแล้วค่ะ');
                 console.log('Responsed to dialogflow!'); 
             }else{
+                globalFunction.checkNumber(agent,numberSwitch1); //Check Number 1,2,3,4
                     //When command only one switch
                 if(numberSwitch2 === ''){
                     if(numberSwitch1 > 0 && numberSwitch1 < 5){
@@ -84,7 +89,9 @@ module.exports = {
                 console.log('Function handleOnOffSwitch run success!');
                 console.log('------------------------------------------------------');
             } catch (ex) {
+                console.log('Dialog Error!!');
                 console.log('Database update error! : '+ex);
+                agent.add('มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ')
             }
     }
 }

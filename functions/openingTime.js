@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 'use strict';
 var moment = require('moment');
+const globalFunction = require('./globalFunction');
 
 
 module.exports = {
@@ -8,13 +9,13 @@ module.exports = {
         console.log('------------------------------------------------------');
         console.log('Function handleCheckOpeningTime is running..')
         var number = agent.parameters['number'];
-        var openingTime = agent.parameters['openingTime_entity'];
+        var openingTime = agent.parameters['openingTime_entity'].toString().replace(/^.*(\d+).*$/i,'$1');
         var now = moment();
         var formatted = now.format('YYYY-MM-DDTHH:mm:ss-07:00');
         var timeNow = moment.utc(formatted).format('HH:mm:ss DD-MM-YYYY');
-        try {
 
-            if(number !== '' && number > 0 && number < 5){
+        globalFunction.checkNumber(agent,number); //Check Number 1,2,3,4
+        try {
                 if(openingTime === '1'){
                     return database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
                         if (!snapshot || !snapshot.exists) {
@@ -81,13 +82,12 @@ module.exports = {
                     console.log('var Opening error');
                     return agent.add('มีบางอย่างผิดพลาด โปรดลองใหม่อีกครั้งค่ะ');
                 }
-            }else{   
-                console.log('Number switch error');
-                return agent.add('ไม่มีสวิตช์นี้ค่ะ โปรดลองใหม่อีกครั้งค่ะ');
-            }
+        
          
         } catch (ex) {
+            console.log('Dialog Error!!');
             console.log('Database update error! : '+ex);
+            return agent.add('มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ')
         }
 
     }
