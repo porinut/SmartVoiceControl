@@ -1,6 +1,5 @@
 /* eslint-disable consistent-return */
 'use strict';
-const globalFunction = require('./globalFunction');
 
 module.exports = {
     handleCheckStatusSwitch: function(agent,database){
@@ -8,10 +7,10 @@ module.exports = {
         console.log('Function handleCheckStatusSwitch is running..')
         var number = agent.parameters['number'];
         var checkStatus = agent.parameters['checkStatus_entity'].toString();
-
-        globalFunction.checkNumber(agent,number); //Check Number 1,2,3,4
+        if(number !== '' && number < 1 || number !== undefined && number > 4){
+            return agent.add('หมายเลขสวิตช์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ');
+        }
         try {
-      
             if(checkStatus === '1'  && number !== '' && number !== undefined && number !== null){
                 console.log('Condition => checkStatus === 1 && number !== ');
                 return database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
@@ -82,7 +81,7 @@ module.exports = {
                     return true;
                 });
             }
-           
+  
         } catch (ex) {
             console.log('Dialog Error!!');
             console.log('Database update error! : '+ex);

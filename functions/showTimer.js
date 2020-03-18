@@ -1,69 +1,72 @@
+/* eslint-disable consistent-return */
 'use strict';
-const globalFunction = require('./globalFunction');
-
-function handleTimer(database,number){
-    console.log('handleTimer...')
-    database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
-        if (!snapshot || !snapshot.exists) {
-            throw new Error("snapshot doesn't exist");
-        }   
-        var timer = snapshot.child('timer').val();
-        console.log('Now varTimer : '+timer);
-        if(timer === true){
-           console.log('Timer is setup');
-           //agent.add('สวิตช์ '+number+ ' มีการตั้งเวลาทำงานอยู่ค่ะ');
-           return 1;
-        }else{
-           console.log('Timer is not setup');
-           return 0;
-           //agent.add('สวิตช์ '+number+ ' ไม่มีการตั้งเวลาค่ะ');
-        }
-    }).catch(error => { 
-        console.log(error) 
-    });
-}
   
 module.exports = {
     
         handleShowTimer: function (agent,database) {
             console.log('------------------------------------------------------');
             console.log('Function ShowTimer is running..');
+            var number = agent.parameters['number'];
+            if(number !== '' && number < 1 || number !== undefined && number > 4){
+                return agent.add('หมายเลขสวิตช์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ');
+            }
             try {
-                var number = agent.parameters['number'];
-                if(number !== undefined || number !== '' || number !== null){
+                if(number !== undefined && number !== '' && number !== null){
                     console.log('Case only one switch');
-                    globalFunction.checkNumber(number);
-                    console.log('Handle Timer return : '+handleTimer(database,number));
-                    if(handleTimer(database,number) === 1 || handleTimer(database,number) === '1'){
-                        agent.add('สวิตช์ '+number+ ' มีการตั้งเวลาทำงานอยู่ค่ะ');
-                    }else{
-                        agent.add('สวิตช์ '+number+ ' ไม่มีการตั้งเวลาค่ะ');
-                    }
-                    console.log('Responsed to Dialogflow!');
+                    return database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
+                        if (!snapshot || !snapshot.exists) {
+                            throw new Error("snapshot doesn't exist");
+                        }   
+                        var timer = snapshot.child('timer').val();
+                        console.log('Retrieve child ok => '+timer);
+                        if(timer === true || timer === 'true'){
+                            agent.add('สวิตช์ '+number+ ' มีการตั้งเวลาทำงานอยู่ค่ะ');  
+                            console.log('Timer is setup');
+                         }else{
+                            agent.add('สวิตช์ '+number+ ' ไม่มีการตั้งเวลาค่ะ');
+                            console.log('Timer is not setup');
+                         }
+                        console.log('Responsed to Dialogflow!');
+                        console.log('Function ShowTimer is run successfull'); 
+                        console.log('------------------------------------------------------'); 
+                        return true;
+                    });
                 }else{
                     console.log('Case all switch');
-                    var count = handleTimer(agent,database,1)+handleTimer(agent,database,2)+handleTimer(agent,database,3)+handleTimer(agent,database,4);
-                    if(count === 4){
-                        agent.add('สวิตช์ทั้งหมดมีการตั้งเวลาอยู่ค่ะ');
-                    }else{
+                    return database.ref('switchStatus').once('value', (snapshot) => {
+                        if (!snapshot || !snapshot.exists) {
+                            throw new Error("snapshot doesn't exist");
+                        }   
                         var on = [];
-                        for(var i=0;i<5;i++){
-                            if( handleTimer(database,i) === 1){
-                               on.push(i);
-                               console.log('pushed!');
-                            }
+                        var count = 1;
+                        snapshot.forEach((childSnapshot) => {
+                            //var childKey = childSnapshot.key;
+                            var childData = childSnapshot.child('timer').val();
+                            //console.log('childData => '+childData);
+                            console.log('Now varTimer : '+childData);
+                            if(childData === true ||childData === 'true'){
+                                console.log('Timer is setup');
+                                on.push(count);
+                             }
+                             count++;
+                        });
+                        if(on.length===4){
+                            agent.add('สวิตช์ทั้งหมดมีการตั้งเวลาอยู่ค่ะ');
+                        }else{
+                            agent.add('สวิตช์ '+on+' มีการตั้งเวลาอยู่ค่ะ');
                         }
-                        agent.add('สวิตช์ '+on+' มีการตั้งเวลาอยู่ค่ะ');
-                    }
+                        console.log('Function ShowTimer is run successfull'); 
+                        console.log('------------------------------------------------------'); 
+                        return true;
+                    });
                 }
-                console.log('Function show timer run success');
-                console.log('------------------------------------------------------');
             } catch (error) {
                 console.log('Dialog Error!!');
                 console.log('Database update error! : '+error);
-                agent.add('มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ')
+                return agent.add('มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
             }
+        }
         
-    }
+        
 }
 

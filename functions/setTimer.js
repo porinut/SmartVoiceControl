@@ -96,7 +96,9 @@ module.exports = {
         var date = agent.parameters['date'];
         var setTimer = agent.parameters['setTimer_entity'].toString().replace(/^.*(\d+).*$/i,'$1');
 
-        globalFunction.checkNumber(agent,number); //Check Number 1,2,3,4
+        if(number !== '' && number < 1 || number !== undefined && number > 4){
+            return agent.add('หมายเลขสวิตช์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ');
+        }
 
         if(number === '' && setTimer === '0'){
             setTimer = '00';

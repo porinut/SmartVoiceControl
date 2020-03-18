@@ -47,7 +47,7 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     }
 
      function handleShowTimer_map(agent) {
-        showTimer.handleShowTimer(agent, database);
+        return showTimer.handleShowTimer(agent, database);
     }
     /*---------------------------------------------------------------------------------------------------------------------*/
 

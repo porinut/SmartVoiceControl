@@ -13,8 +13,9 @@ module.exports = {
         var now = moment();
         var formatted = now.format('YYYY-MM-DDTHH:mm:ss-07:00');
         var timeNow = moment.utc(formatted).format('HH:mm:ss DD-MM-YYYY');
-
-        globalFunction.checkNumber(agent,number); //Check Number 1,2,3,4
+        if(number !== '' && number < 1 || number !== undefined && number > 4){
+            return agent.add('หมายเลขสวิตช์ไม่ถูกต้อง โปรดลองอีกครั้งค่ะ');
+        }
         try {
                 if(openingTime === '1'){
                     return database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
@@ -82,8 +83,6 @@ module.exports = {
                     console.log('var Opening error');
                     return agent.add('มีบางอย่างผิดพลาด โปรดลองใหม่อีกครั้งค่ะ');
                 }
-        
-         
         } catch (ex) {
             console.log('Dialog Error!!');
             console.log('Database update error! : '+ex);
