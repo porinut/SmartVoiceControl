@@ -42,7 +42,7 @@ module.exports = {
                 dialogflowModel.addResponse(agent,'1','ปิดสวิตช์ทั้งหมดแล้วค่ะ','เปิดสวิตช์ทั้งหมดแล้วค่ะ');
                 console.log('Responsed to dialogflow!'); 
             }else{
-                globalFunction.checkNumber(agent,numberSwitch1); //Check Number 1,2,3,4
+                //globalFunction.checkNumber(agent,numberSwitch1); //Check Number 1,2,3,4
                     //When command only one switch
                 if(numberSwitch2 === ''){
                     if(numberSwitch1 > 0 && numberSwitch1 < 5){

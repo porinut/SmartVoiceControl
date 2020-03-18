@@ -66,6 +66,25 @@ function updateTimer(database,numberSwitch,timer){
     });
 }
 
+function handleTimeout(database,number,setTimer){
+    database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
+        if (!snapshot || !snapshot.exists) {
+            throw new Error("snapshot doesn't exist");
+        }   
+        var timer = snapshot.child('timer').val();
+        console.log('Now varTimer : '+timer);
+        if(timer === true){
+            updateFirebase(database,number,setTimer,false);
+            console.log('Updated Firebase! at '+timeNow());
+        }else{
+            console.log('Timer is cancelled');
+        }
+        return true;
+    }).catch(error => { 
+        console.log(error) 
+    });
+}
+
 
 module.exports = {
 
@@ -106,25 +125,11 @@ module.exports = {
                     console.log('Difference Time => '+ ms);
 
                     if(setTimer === 1 || setTimer === '1' || setTimer === 0 || setTimer === '0'){
+                        console.log('Update var Timer : true');
                         updateTimer(database,number,true);
                   
                         setTimeout(() => {
-                                database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
-                                if (!snapshot || !snapshot.exists) {
-                                    throw new Error("snapshot doesn't exist");
-                                }   
-                                var timer = snapshot.child('timer').val();
-                                console.log('Now varTimer : '+timer);
-                                if(timer === true){
-                                    updateFirebase(database,number,setTimer,false);
-                                    console.log('Updated Firebase! at '+timeNow());
-                                }else{
-                                    console.log('Timer is cancelled');
-                                }
-                                return true;
-                            }).catch(error => { 
-                                console.log(error) 
-                            });
+                            handleTimeout(database,number,setTimer);
                         }, ms);
 
                         dialogflowModel.addResponse(agent,setTimer,voice_0,voice_1);
@@ -139,29 +144,18 @@ module.exports = {
                         }
 
                         console.log('setTime ='+setT);
-                        updateTimer(database,number,true);
+
+                        console.log('Update var Timer : true');
+                        updateTimer(database,1,true);
+                        updateTimer(database,2,true);
+                        updateTimer(database,3,true);
+                        updateTimer(database,4,true);
                   
                         setTimeout(() => {
-                            database.ref('switchStatus/switch'+number).once('value').then((snapshot) => {
-                                if (!snapshot || !snapshot.exists) {
-                                    throw new Error("snapshot doesn't exist");
-                                }   
-                                var timer = snapshot.child('timer').val();
-                                console.log('Now varTimer : '+timer);
-                                if(timer === true) {
-                                    updateFirebase(database,'1',setT,false);
-                                    updateFirebase(database,'2',setT,false);
-                                    updateFirebase(database,'3',setT,false);
-                                    updateFirebase(database,'4',setT,false);
-                                    console.log('set varTimer : false');
-                                    console.log('Updated Firebase! at '+timeNow());
-                                }else{
-                                    console.log('Timer is cancelled');
-                                }
-                                return true;
-                            }).catch(error => { 
-                                console.log(error) 
-                            });
+                            handleTimeout(database,1,setT);
+                            handleTimeout(database,2,setT);
+                            handleTimeout(database,3,setT);
+                            handleTimeout(database,4,setT);
                         }, ms);
 
                         dialogflowModel.addResponse(agent,setT,voice_00,voice_11);
