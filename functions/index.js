@@ -15,6 +15,7 @@ const controlRoom = require('./controlRoom');
 const openingTime = require('./openingTime');
 const setTimer = require('./setTimer');
 const cancelSetTimer = require('./cancelSetTimer');
+const showTimer = require('./showTimer');
 
 
 
@@ -45,17 +46,9 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
         cancelSetTimer.handleCancelSetTimer(agent, database);
     }
 
-
-    function handleYoutube_map(agent) {
-       // let conv = agent.conv();
-       // conv.ask(new Permission({
-       //   context: 'To give results in your area',
-        //  permissions: 'DEVICE_PRECISE_LOCATION',
-       // }))
-        //agent.add(conv);
-        cancelSetTimer.handleCancelSetTimer(agent, database);
+     function handleShowTimer_map(agent) {
+        showTimer.handleShowTimer(agent, database);
     }
-
     /*---------------------------------------------------------------------------------------------------------------------*/
 
     /*-------------------------------------------Old Code-----------------------------------------------*/
@@ -83,8 +76,11 @@ exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, resp
     intenMap.set('check_status_Intent', handleCheckStatusSwitch_map);
     intenMap.set('check_opening_Intent', handleCheckOpeningTime_map);
     intenMap.set('set_timer_Intent', handleSetTimer_map);
-    intenMap.set('cencel_timer_Intent', handleCancelSetTimer_map);
-    intenMap.set('youtube_Intent', handleYoutube_map);
+    //intenMap.set('cencel_timer_Intent', handleCancelSetTimer_map);
+    intenMap.set('youtube_Intent', handleCancelSetTimer_map);
+    //intenMap.set('show_timer_Intent', handleCancelSetTimer_map);
+    intenMap.set('youtube2_intent', handleShowTimer_map);
+    //intenMap.set('youtube_Intent', handleYoutube_map);
     
     intenMap.set('bedroomLight_Intent', handleBedroomLight_map);
     intenMap.set('livingroomLight_Intent', handleLivingroomLight_map);
