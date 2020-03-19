@@ -1,5 +1,16 @@
 /* eslint-disable consistent-return */
 'use strict';
+var moment = require('moment');
+
+function timeResDialogflow(time){
+    var timeResponse = moment.utc(time).format('HH:mm:ss');
+    return timeResponse;
+}
+
+function dateResDialogflow(date){
+    var dateResponse = moment.utc(date).format('DD-MM-YYYY');
+    return dateResponse;
+}
   
 module.exports = {
     
@@ -18,9 +29,14 @@ module.exports = {
                             throw new Error("snapshot doesn't exist");
                         }   
                         var timer = snapshot.child('timer').val();
-                        console.log('Retrieve child ok => '+timer);
+                        var timeFuture = snapshot.child('timeFuture').val();
+                        console.log('Retrieve child timer ok => '+timer);
+                        console.log('Retrieve child timeFuture ok => '+timeFuture);
                         if(timer === true || timer === 'true'){
-                            agent.add('สวิตช์ '+number+ ' มีการตั้งเวลาทำงานอยู่ค่ะ');  
+                            agent.add('สวิตช์ '+number+ ' มีการตั้งเวลาทำงานอยู่ค่ะ');
+                            agent.add('จะทำงานเวลา '+timeResDialogflow(timeFuture)+' วันที่ '+dateResDialogflow(timeFuture));
+                            console.log('Time Response to Dialogflow : '+timeResDialogflow(timeFuture));
+                            console.log('Date Response to Dialogflow : '+dateResDialogflow(timeFuture));
                             console.log('Timer is setup');
                          }else{
                             agent.add('สวิตช์ '+number+ ' ไม่มีการตั้งเวลาค่ะ');
@@ -66,7 +82,5 @@ module.exports = {
                 return agent.add('มีบางอย่างผิดพลาด กรุณาลองใหม่อีกครั้งค่ะ');
             }
         }
-        
-        
 }
 

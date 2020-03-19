@@ -2,7 +2,6 @@
 'use strict';
 var moment = require('moment');
 const dialogflowModel = require('./dialogflow_model');
-const globalFunction = require('./globalFunction');
 
 function timeFuture(time,date){
     //Date and Time formatted for convert to milliSec
@@ -59,10 +58,12 @@ function updateFirebase(database,numberSwitch,status,timer){
     });
 }
 
-function updateTimer(database,numberSwitch,timer){
+function updateTimer(database,numberSwitch,timer,timeFuture){
     console.log('update varTimer : '+timer);
+    console.log('update  var timefuture: '+timeFuture);
     database.ref('switchStatus/'+'switch'+numberSwitch).update({
-        timer: timer
+        timer: timer,
+        timeFuture: timeFuture
     });
 }
 
@@ -125,10 +126,10 @@ module.exports = {
                     var voice_11 = "ตั้งเวลาเปิดสวิตช์ทั้งหมดเวลา " +timeResDialogflow(time)+" วันที่ "+dateResDialogflow(date)+" เรียบร้อยแล้วค่ะ";
                     console.log('Case turn of');
                     console.log('Difference Time => '+ ms);
-
+                    var catTime = timeFuture(time,date); 
                     if(setTimer === 1 || setTimer === '1' || setTimer === 0 || setTimer === '0'){
                         console.log('Update var Timer : true');
-                        updateTimer(database,number,true);
+                        updateTimer(database,number,true,catTime);
                   
                         setTimeout(() => {
                             handleTimeout(database,number,setTimer);
@@ -148,10 +149,10 @@ module.exports = {
                         console.log('setTime ='+setT);
 
                         console.log('Update var Timer : true');
-                        updateTimer(database,1,true);
-                        updateTimer(database,2,true);
-                        updateTimer(database,3,true);
-                        updateTimer(database,4,true);
+                        updateTimer(database,1,true,catTime);
+                        updateTimer(database,2,true,catTime);
+                        updateTimer(database,3,true,catTime);
+                        updateTimer(database,4,true,catTime);
                   
                         setTimeout(() => {
                             handleTimeout(database,1,setT);
